@@ -24,7 +24,7 @@
         </p>
         <div class="hero-actions">
             <a href="{{ url_for('register') }}" class="hero-btn">Create free account</a>
-            <a href="#features" class="hero-btn">See how it works</a>
+            <button type="button" class="hero-btn" id="openHowItWorksBtn">See how it works</button>
         </div>
     </div>
 
@@ -104,4 +104,68 @@
     </div>
 </section>
 
+<div id="howItWorksModal" class="video-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="howItWorksModalTitle">
+    <div class="video-modal-content">
+        <div class="video-modal-header">
+            <h2 id="howItWorksModalTitle" class="video-modal-title">How Spendly works</h2>
+            <button type="button" class="video-modal-close" id="closeHowItWorksBtn" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="video-modal-body">
+            <iframe
+                id="howItWorksVideo"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                title="How Spendly works"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    (function () {
+        const openBtn = document.getElementById('openHowItWorksBtn');
+        const closeBtn = document.getElementById('closeHowItWorksBtn');
+        const modal = document.getElementById('howItWorksModal');
+        const videoFrame = document.getElementById('howItWorksVideo');
+
+        if (!openBtn || !closeBtn || !modal || !videoFrame) return;
+
+        const videoSrc = videoFrame.getAttribute('src') || '';
+
+        function openModal() {
+            if (videoSrc && videoFrame.getAttribute('src') !== videoSrc) {
+                videoFrame.setAttribute('src', videoSrc);
+            }
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            videoFrame.setAttribute('src', '');
+        }
+
+        openBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+
+        modal.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                closeModal();
+            }
+        });
+    })();
+</script>
 {% endblock %}
