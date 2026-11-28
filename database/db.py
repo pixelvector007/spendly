@@ -93,3 +93,59 @@ def seed_db():
         conn.commit()
     finally:
         conn.close()
+
+
+# ------------------------------------------------------------------ #
+# User Queries                                                        #
+# ------------------------------------------------------------------ #
+
+def get_user_by_email(email):
+    """Return the user row matching a normalized email address, or None."""
+    normalized_email = email.strip().lower()
+    conn = get_db()
+    try:
+        return conn.execute(
+            """
+            SELECT id, name, email, password_hash, created_at
+            FROM users
+            WHERE LOWER(email) = ?
+            """,
+            (normalized_email,),
+        ).fetchone()
+    finally:
+        conn.close()
+
+
+def get_user_by_id(user_id):
+    """Return non-secret user fields for a given user ID, or None."""
+    conn = get_db()
+    try:
+        return conn.execute(
+            """
+            SELECT id, name, email, created_at
+            FROM users
+            WHERE id = ?
+            """,
+            (user_id,),
+        ).fetchone()
+    finally:
+        conn.close()
+
+
+def create_user(name, email, password_hash):
+    """Insert a new user record and return the created user ID."""
+    clean_name = name.strip()
+    normalized_email = email.strip().lower()
+    conn = get_db()
+    try:
+        cursor = conn.execute(
+            """
+            INSERT INTO users (name, email, password_hash)
+            VALUES (?, ?, ?)
+            """,
+            (clean_name, normalized_email, password_hash),
+        )
+        conn.commit()
+        return cursor.lastrowid
+    finally:
+        conn.close()
